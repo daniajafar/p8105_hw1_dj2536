@@ -1,7 +1,7 @@
 ---
 title: "p8105_hw1_dj2536"
 author: Dania Jafar
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
