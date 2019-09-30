@@ -14,16 +14,88 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r cars}
-summary(cars)
+```{r problem1}
+
+library(tidyverse)
+dataframe = tibble (
+  x = rnorm(8),
+  vec_logical = x > 0,
+  vec_char = c("I'm Dania"),
+  vec_factor = factor(c("low", "medium", "high", "low", "medium", "high", "low", "medium")))
+
+mean(pull(dataframe, x))
+mean(pull(dataframe, vec_logical))
+mean(pull(dataframe, vec_char))
+mean(pull(dataframe, vec_factor))
+```
+#a random sample of size 8 from a standard Normal distribution
+#a logical vector indicating whether elements of the sample are greater than 0
+#a character vector of length 8
+#a factor vector of length 8, with 3 different factor “levels”
+# taking the mean of x and vec_logical works but it doesn't work to take the mean of vec_factor and vec_char. 
+
+```{r problem1.1, results = 'hide'}
+log_to_num = as.numeric(pull(dataframe, vec_logical))
+char_to_num = as.numeric(pull(dataframe, vec_char))
+fac_to_num = as.numeric(pull(dataframe, vec_factor))
+```
+#I see that that the logical and numeric variables are are able to be converted to numeric but the character variable is not. This helps to explain why I got a mean of 0.25 for the mean of the logical variable. This is because R already has default values of 1 and 0 for true and false, respectively. 
+```{r problem1.2}
+x = rnorm(8)
+a = as.numeric(pull(dataframe, vec_logical)) * x
+b = as.factor(pull(dataframe, vec_logical)) * x
+c = as.numeric(b) * x
 ```
 
-## Including Plots
+```{r problem2}
 
-You can also embed plots, for example:
+library(tidyverse)
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+dataframe2 = tibble(
+x = rnorm (500),
+y = rnorm (500),
+vec_logical = x + y > 1,
+d = as.numeric(vec_logical),
+e = as.factor(vec_logical)
+)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Description of the dataframe 
+
+* The size of the dataframe is `r nrow(dataframe2)` and the number of columns are `r ncol(dataframe2)`  
+* The mean of x is `r mean(pull(dataframe2,x))`
+* The median of x is `r median(pull(dataframe2, x))`
+* The standard deviation of x is `r sd(pull(dataframe2, x))`
+* The proportion of cases for which x + y > 1 is `r sum(pull(dataframe2,vec_logical),na.rm=TRUE)/500`
+
+
+```{r}
+# A scatterplot of y vs x
+plot1 = ggplot(dataframe2, aes( x = x, y = y)) + 
+  geom_point(aes(color = vec_logical))
+
+plot1
+```
+Since a logical vector has a value of True or False, the key shows those two values and they are each given their own color (true = teal and false = coral), those are the points we see output. 
+
+```{r}
+#A second scatterplot using numeric variables
+plot2 = ggplot(dataframe2, aes( x = x, y = y)) + 
+  geom_point(aes(color = d))
+
+plot2
+```
+Here we see a gradient of color from light blue to dark blue. However, since the the numeric value of the logical vector is 0 or 1, we just see the colors for 0 and 1 on the graph, which are light blue and dark blue. We don't see the internmediates. 
+
+```{r}
+#A third scatterplot using factor variables
+plot3 = ggplot(dataframe2, aes( x = x, y = y)) + 
+  geom_point(aes(color = e))
+
+plot3
+```
+This plot is essentially the same as the logical vector scatterplot. In this case, the key shows 0 and 1 instead of false and true, but it corresponds to the same thing. 
+
+```{r}
+ggsave ("question2.pdf", plot = plot1)
+```
